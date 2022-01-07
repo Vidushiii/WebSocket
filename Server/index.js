@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { Post, Users, Posts } = require('./model');
+const { Users, Posts } = require('./model');
 const app = express();
 app.use(express.urlencoded({ extended: false }));
 const PORT = 3501;
@@ -71,17 +71,26 @@ app.get('/posts/:id', async (req, res) => {
   return res.status(200).json({ message: 'success', result });
 });
 
-app.post('/comment', (req, res) => {
+app.post('/comment', async (req, res) => {
   const { content, postID, userID } = req.body;
   if (!content) return res.status(404).json({ message: 'content not found' });
   if (!postID) return res.status(404).json({ message: 'postID not found' });
   if (!userID) return res.status(404).json({ message: 'userID not found' });
 
-  const result = Posts.findByIdAndUpdate(
-    { postID },
-    { $push: { comment: { content, author: userID } } },
+  const result = await Posts.findByIdAndUpdate(
+    postID,
+    {
+      $push: { comment: { content, author: userID } },
+    },
+    { new: true },
   );
+  console.log(result);
   res.status(200).json({ message: 'success', result });
+});
+
+app.use((err, req, res, next) => {
+  console.log(err);
+  if(err) res.status(500).json({message: 'Internal Server Error: Check server logs', ...req.body});
 });
 
 app.listen(PORT, () => {
