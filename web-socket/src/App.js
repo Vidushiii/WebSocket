@@ -1,14 +1,22 @@
+import "./index.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./Login";
+import { useState } from "react";
 
-function App() {
+const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Implementation of  <code>Web-Socket</code> for POC.
-        </p>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          exact
+          element={<Login setIsAuthenticated={setIsAuthenticated} />}
+        />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
