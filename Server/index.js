@@ -32,10 +32,19 @@ app.post('/createUser', async (req, res) => {
   return res.status(200).json({ ...req.body, message: 'User created', result });
 });
 
-app.post('/post');
-app.post('/comment')
-/** Protected routes end here */
+app.post('/createPost', async (req, res) => {
+  const { content, userID } = req.body;
+  if (!content) return res.status(404).json({ message: 'content not found' });
+  if (!userID) return res.status(404).json({ message: 'userID not found' });
 
+  const result = await Posts.create({
+    postContent: content,
+    author: userID,
+  });
+
+  res.status(200).json({ message: 'success', result });
+});
+/** Protected routes end here */
 
 //Login route
 app.post('/login', async (req, res) => {
@@ -60,6 +69,19 @@ app.get('/posts/:id', async (req, res) => {
   const result = await Posts.findById(req.params.id);
   if (!result) return res.status(200).json({ message: 'No posts found' });
   return res.status(200).json({ message: 'success', result });
+});
+
+app.post('/comment', (req, res) => {
+  const { content, postID, userID } = req.body;
+  if (!content) return res.status(404).json({ message: 'content not found' });
+  if (!postID) return res.status(404).json({ message: 'postID not found' });
+  if (!userID) return res.status(404).json({ message: 'userID not found' });
+
+  const result = Posts.findByIdAndUpdate(
+    { postID },
+    { $push: { comment: { content, author: userID } } },
+  );
+  res.status(200).json({ message: 'success', result });
 });
 
 app.listen(PORT, () => {
