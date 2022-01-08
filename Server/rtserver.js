@@ -1,5 +1,7 @@
 const express = require('express');
 const app = express();
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 const { instrument } = require('@socket.io/admin-ui');
 const http = require('http').createServer(app);
 const PORT = 3510;
@@ -22,24 +24,22 @@ io.on('connection', (socket) => {
     socket.join(room);
     console.log(`${socket.id} joined`);
     socket.emit('joinedRoom', { message: `${room} joined` });
-    socket.to(room).emit('comment',{message: 'New comment published'});
   });
-
-
-  const emitComment = () => {
-    socket.broadcast.emit('comment', doc, (res) => console.log(res));
-  };
 });
+
+const emitComment = () => {
+  io.to().emit('comment', doc);
+};
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello from the real time server</h1>');
 });
 
 app.post('/comment', (req, res) => {
-  console.log(req);
   const { doc } = req.body;
   if (!doc) return res.status(400).json({ message: 'Parameters not found' });
   //TODO: Emit to the postID room
+  emitComment('jVC8dbKTqsPixFD_AAAH');
   return res.status(200).json({ message: 'success' });
 });
 
