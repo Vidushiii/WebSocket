@@ -1,35 +1,81 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from 'axios'
+import styled from 'styled-components';
 import { Post, Back } from "./Styles/ChannelPage";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
-const ChannelPage = () => {
+const ChannelPage = ({user, socket}) => {
 
     const [comment,setComment]=useState("");
-    const [showComments, setShowComments]=useState([]);
+    const [comments, setComments]=useState([]);
+    const [post, setPost] = useState();
 
-    const ShowComment = (e) => {
-        e.preventDefault();
-        const data=comment;
-        if(comment)
-        {setShowComments((ls)=>[...ls,data])
-        setComment("")
+    const fetchPost = async (id) => {
+        const result = await axios({
+            method: 'get',
+            params: {id},
+            url: `http://localhost:3501/posts/${id}`,
+        })
+        if(result){
+            setPost(result.data.result);
+            setComments([...result.data.result.comment]);
+        }
     }
+    const { id } = useParams();
+
+    useEffect(()=>{
+        socket && socket.emit("joinRoom", id);
+    },[socket, id])
+
+    useEffect(() => {
+        fetchPost(id)
+    }, [id])
+    const addComment = async(e) => {
+        e.preventDefault();
+        if(comment){
+            const result = await axios({
+                method: 'post',
+                url: `http://localhost:3501/comment`,
+                data: {
+                    userID: user.id,
+                    postID: id,
+                    content: comment
+                }
+            })
+            console.log(result);
+            if(result){
+                setComment('');
+                setComments([...comments, result.data.result.comment]);
+            }
+        }
     }
 
     return(
         <><div>
             <Post>
-            <div><h2>Q. 1 - How does react work ?</h2>
-            <form onSubmit={ShowComment}>
+            <div><h2>{post && post.postContent}</h2>
+            <form onSubmit={addComment}>
             <input name="name" placeholder="Post a comment !!" value={comment} onChange={(e)=> setComment(e.target.value)}/>
             </form>
             </div>
             <Back><Link to={'/forum'}>Back</Link></Back>
             </Post>
-            {showComments.map(a =><li>{a}</li>)}
+            {comments.length>0 && comments.map(a =>
+                <CommentCard key={a._id}>
+                    {a.content}
+                </CommentCard>
+                )}
           </div>
         </>
     )
 }
 
 export default ChannelPage;
+
+
+const CommentCard = styled.div`
+    height: 50px;
+    color: white;
+    margin:10px 0;
+    background-color: grey;
+`;
