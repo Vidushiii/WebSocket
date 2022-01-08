@@ -78,7 +78,7 @@ app.get('/posts', async (req, res) => {
 
 // Fetch specific posts
 app.get('/posts/:id', async (req, res) => {
-  const result = await Posts.findById(req.params.id);
+  const result = await Posts.findById(req.params.id).populate('comment.author');
   if (!result) return res.status(200).json({ message: 'No posts found' });
   return res.status(200).json({ message: 'success', result });
 });
