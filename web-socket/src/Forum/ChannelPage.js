@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Post, Back } from "./Styles/ChannelPage";
 import { Link, useParams } from "react-router-dom";
 
-const ChannelPage = ({user}) => {
+const ChannelPage = ({user, socket}) => {
 
     const [comment,setComment]=useState("");
     const [comments, setComments]=useState([]);
@@ -22,6 +22,16 @@ const ChannelPage = ({user}) => {
         }
     }
     const { id } = useParams();
+
+    useEffect(()=>{
+        socket && socket.emit("joinRoom", id);
+        socket && socket.on('comment', (data)=> {
+        console.log(data);
+        if(user.id !== data.author){
+            setComments((comments) => [...comments, data.comment]);
+        }
+        })
+    },[socket, id, user.id])
 
     useEffect(() => {
         fetchPost(id)
@@ -57,7 +67,7 @@ const ChannelPage = ({user}) => {
             <Back><Link to={'/forum'}>Back</Link></Back>
             </Post>
             {comments.length>0 && comments.map(a =>
-                <CommentCard key={a.id}>
+                <CommentCard key={a._id}>
                     {a.content}
                 </CommentCard>
                 )}
