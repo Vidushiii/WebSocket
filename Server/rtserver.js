@@ -27,8 +27,8 @@ io.on('connection', (socket) => {
   });
 });
 
-const emitComment = () => {
-  io.to().emit('comment', doc);
+const emitComment = (doc) => {
+  io.to(doc._id).emit('comment', doc);
 };
 
 app.get('/', (req, res) => {
@@ -39,7 +39,7 @@ app.post('/comment', (req, res) => {
   const { doc } = req.body;
   if (!doc) return res.status(400).json({ message: 'Parameters not found' });
   //TODO: Emit to the postID room
-  emitComment('jVC8dbKTqsPixFD_AAAH');
+  emitComment(doc);
   return res.status(200).json({ message: 'success' });
 });
 

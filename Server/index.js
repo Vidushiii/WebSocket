@@ -95,7 +95,7 @@ app.post('/comment', async (req, res) => {
       $push: { comment: { content, author: userID } },
     },
     { new: true },
-  );
+  ).populate('comment.author');
   const {_id, author, comment, createdAt, updatedAt } = result;
   let newComment = comment.pop();
   let resObj = {_id, author, comment: newComment, createdAt, updatedAt}
