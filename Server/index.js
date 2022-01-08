@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const axios = require('axios');
 const { Users, Posts } = require('./model');
 require('dotenv').config();
 
@@ -95,13 +96,27 @@ app.post('/comment', async (req, res) => {
     },
     { new: true },
   );
-  console.log(result);
-  res.status(200).json({ message: 'success', result: req.body });
+  const {_id, author, comment, createdAt, updatedAt } = result;
+  let newComment = comment.pop();
+  let resObj = {_id, author, comment: newComment, createdAt, updatedAt}
+  // Send a post request
+  axios({
+    method: 'post',
+    url: 'http://localhost:3510/comment',
+    data: { doc: resObj},
+  })
+    .then((res) => console.log(res.data))
+    .catch((err) => console.log('Error:', err));
+  res.status(200).json({ message: 'success', result: resObj });
 });
 
 app.use((err, req, res, next) => {
   console.log(err);
-  if(err) res.status(500).json({message: 'Internal Server Error: Check server logs', ...req.body});
+  if (err)
+    res.status(500).json({
+      message: 'Internal Server Error: Check server logs',
+      ...req.body,
+    });
 });
 
 app.listen(PORT, () => {
