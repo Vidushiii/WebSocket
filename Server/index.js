@@ -1,7 +1,17 @@
 const express = require('express');
+const cors = require('cors');
 const mongoose = require('mongoose');
 const { Users, Posts } = require('./model');
+require('dotenv').config();
+
+
 const app = express();
+
+const corsOptions = {
+  exposedHeaders: 'auth-header',
+};
+app.use(cors(corsOptions));
+app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 const PORT = 3501;
 
@@ -11,9 +21,10 @@ const PORT = 3501;
 // })();
 
 //TODO: Database addition
+const uri = process.env.DB_URI;
 
 mongoose
-  .connect('mongodb://localhost/Forum')
+  .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB...'))
   .catch((err) => console.error('Could not connect to MongoDB...', err));
 
@@ -53,7 +64,7 @@ app.post('/login', async (req, res) => {
   const result = await Users.findOne({ name });
   if (!result) return res.status(404).json({ message: 'User not found' });
   return result.password === password
-    ? res.status(200).json({ ...req.body, token, message: 'success' })
+    ? res.status(200).json({ ...req.body, id: result._id, token, message: 'success' })
     : res.status(400).json({ ...req.body, message: 'password not match' });
 });
 
@@ -85,7 +96,7 @@ app.post('/comment', async (req, res) => {
     { new: true },
   );
   console.log(result);
-  res.status(200).json({ message: 'success', result });
+  res.status(200).json({ message: 'success', result: req.body });
 });
 
 app.use((err, req, res, next) => {
