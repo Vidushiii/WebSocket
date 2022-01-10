@@ -41,8 +41,8 @@ const Homepage = ({isAuthenticated, user}) => {
 
     const ChannelList = () => (
         posts.map(data=> (
-            <Link to={`/forum/${data._id}`}>
-                <PostCard key={data.id}>
+            <Link key={data._id} to={`/forum/${data._id}`}>
+                <PostCard>
                     {data.postContent}
                 </PostCard>
             </Link >

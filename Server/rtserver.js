@@ -16,6 +16,7 @@ const io = require('socket.io')(http, {
 
 io.on('connection', (socket) => {
   //Connection established
+  console.log('Connection Established', socket.id)
   socket.send({ socketId: socket.id });
   // Join the room with post ID
   // Broadcast to the postID room
@@ -25,6 +26,11 @@ io.on('connection', (socket) => {
     console.log(`${socket.id} joined`);
     socket.emit('joinedRoom', { message: `${room} joined` });
   });
+  socket.on('leaveRoom', (room)=> {
+    socket.leave(room);
+    console.log(`${socket.id} left`);
+    socket.emit('leavedRoom', { message: `${room} left` });
+  })
 });
 
 const emitComment = (doc) => {

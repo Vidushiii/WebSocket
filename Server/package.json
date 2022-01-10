@@ -6,11 +6,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "devSocketIO": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "rtServer": "nodemon rtserver.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
     "@socket.io/admin-ui": "^0.2.0",
     "axios": "^0.24.0",
     "express": "^4.17.2",

@@ -22,6 +22,7 @@ const App = () => {
       setIsAuthenticated(true);
     }
     if(isAuthenticated){
+      console.log("Initializing Socket.io")
       socket = io(ENDPOINT);
     }
     setIsLoading(false);

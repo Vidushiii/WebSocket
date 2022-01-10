@@ -11,7 +11,7 @@ const CreateUser = ({ setIsAuthenticated }) => {
     e.preventDefault();
     const result = await axios({
       method: 'post',
-      url: 'http://localhost:3501//createPost',
+      url: 'http://localhost:3501/createUser',
       data: {
         name: username,
         password
