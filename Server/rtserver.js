@@ -31,6 +31,17 @@ io.on('connection', (socket) => {
     console.log(`${socket.id} left`);
     socket.emit('leavedRoom', { message: `${room} left` });
   })
+  socket.on('message', message => {
+    if(message.action === 'CREATE'){
+      io.to(message.room).emit('CREATE', message);
+    }
+    if(message.action === 'UPDATE'){
+      io.to(message.room).emit('UPDATE', message);
+    }
+  })
+  socket.on("disconnect", (reason) => {
+    console.log(`Client ${socket.id} got disconnected due to ${reason}`)
+  });
 });
 
 const emitComment = (doc) => {
